@@ -40,6 +40,7 @@ namespace MyPortfolioAPI
             services.AddDbContext<DataContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddCors();
             services.AddAutoMapper(typeof(DatingRepo).Assembly);
+            services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings"));
 
             services.AddScoped<IAuthRepo, AuthRepo>();
             services.AddScoped<IDatingRepo, DatingRepo>();

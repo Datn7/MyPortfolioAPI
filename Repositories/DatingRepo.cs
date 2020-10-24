@@ -45,5 +45,17 @@ namespace MyPortfolioAPI.Repositories
         {
             return await context.SaveChangesAsync() > 0;
         }
+
+        public async Task<Photo> GetPhoto(int id)
+        {
+            var photo = await context.Photos.FirstOrDefaultAsync(p => p.Id == id);
+            return photo;
+        }
+
+        public async Task<Photo> GetMainPhotoForUser(int UserId)
+        {
+            return await context.Photos.Where(u => u.UserId == UserId).FirstOrDefaultAsync(p => p.IsMain);
+        }
+
     }
 }
