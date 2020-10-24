@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -20,11 +21,13 @@ namespace MyPortfolioAPI.Controllers
     {
         private readonly IAuthRepo repo;
         private readonly IConfiguration configuration;
+        private readonly IMapper mapper;
 
-        public AuthController(IAuthRepo repo, IConfiguration configuration)
+        public AuthController(IAuthRepo repo, IConfiguration configuration, IMapper mapper )
         {
             this.repo = repo;
             this.configuration = configuration;
+            this.mapper = mapper;
         }
 
         [HttpPost("register")]
@@ -35,14 +38,13 @@ namespace MyPortfolioAPI.Controllers
             if (await repo.UserExists(userForRegisterDto.Username))
                 return BadRequest("მომხმარებელი არსებობს უკვე");
 
-            var userToCreate = new User
-            {
-                Username = userForRegisterDto.Username
-            };
+            var userToCreate = mapper.Map<User>(userForRegisterDto);
 
             var createdUser = await repo.Register(userToCreate, userForRegisterDto.Password);
 
-            return StatusCode(201);
+            var userToReturn = mapper.Map<UserForDetailedDto>(createdUser);
+
+            return CreatedAtRoute("GetUser", new { controller = "Users", id = createdUser.Id }, userToReturn);
         }
 
         [HttpPost("login")]
